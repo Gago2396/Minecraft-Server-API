@@ -1,9 +1,9 @@
 module.exports = {
-    HOST: "",
-    USER: "",
-    PASSWORD: "",
-    DB: "",
-    dialect: "mysql",
+    HOST: "127.0.0.1",
+    USER: "minecraft",
+    PASSWORD: "P@ssw0rd",
+    DB: "minecraft",
+    dialect: "mariadb",
     pool: {
       max: 5,
       min: 0,
