@@ -64,4 +64,11 @@ module.exports = function (app) {
     app.get('/status', controller.getStatus);
 
     app.get('/backup', controller.backup);
+
+    app.post('/start', controller.start);
+
+    app.post('/stop', controller.stop);
+
+    app.post('/command', controller.command);
+
 }

@@ -3,6 +3,7 @@ const Role = db.role;
 const User = db.user;
 
 var exec = require('child_process').exec;
+var spawn = require('child_process').spawn;
 const axios = require('axios');
 
 const util = require('util');
@@ -14,6 +15,57 @@ const rutaCopia = '../../../CopiaSeguridad';
 const nombreCopia = 'ServerBackup-1';
 const remoteFilePath = '/home/garito/Escritorio/ServerFabric1.20.1/mods/'
 
+function log(data) {
+    process.stdout.write(data.toString());
+}
+
+var minecraftServerProcess = null;
+
+exports.start = async (request, response) => {
+    if (!minecraftServerProcess) {
+        minecraftServerProcess = spawn('java', [
+            '-Xmx4G',
+            '-jar',
+            'fabric-server-mc.1.20.1-loader.0.14.24-launcher.0.11.2.jar',
+            'nogui'
+        ]);
+
+        minecraftServerProcess.stdout.on('data', log);
+        minecraftServerProcess.stderr.on('data', log);
+        if (response) {
+            response.send('Minecraft server started.');
+        }
+    } else {
+        response.send('Minecraft server is already running.');
+    }
+}
+
+exports.stop = (request, response) => {
+    if (minecraftServerProcess) {
+        minecraftServerProcess.stdin.write('/stop' + '\n');
+        console.log(minecraftServerProcess);
+        minecraftServerProcess = null;
+        response.send('Minecraft server stopped.');
+    } else {
+        response.send('Minecraft server is not running.');
+    }
+}
+
+exports.command = (request, response) => {
+    var command = request.body.command;
+    minecraftServerProcess.stdin.write(command + '\n');
+
+    var buffer = [];
+    var collector = function (data) {
+        data = data.toString();
+        buffer.push(data.split(']: ')[1]);
+    };
+    minecraftServerProcess.stdout.on('data', collector);
+    setTimeout(function () {
+        minecraftServerProcess.stdout.removeListener('data', collector);
+        response.send(buffer.join(''));
+    }, 250);
+}
 
 exports.getUsers = async (req, res) => {
     try {
