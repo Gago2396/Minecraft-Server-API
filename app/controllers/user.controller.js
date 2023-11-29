@@ -33,10 +33,10 @@ exports.start = async (request, response) => {
         minecraftServerProcess.stdout.on('data', log);
         minecraftServerProcess.stderr.on('data', log);
         if (response) {
-            response.send('Minecraft server started.');
+            response.status(200).send({ message: 'Minecraft server started.' });
         }
     } else {
-        response.send('Minecraft server is already running.');
+        response.status(400).send({ error: 'Minecraft server is already running.' });
     }
 }
 
@@ -45,9 +45,9 @@ exports.stop = (request, response) => {
         minecraftServerProcess.stdin.write('/stop' + '\n');
         console.log(minecraftServerProcess);
         minecraftServerProcess = null;
-        response.send('Minecraft server stopped.');
+        response.status(200).send({ message: 'Minecraft server stopped.' });
     } else {
-        response.send('Minecraft server is not running.');
+        response.status(400).send({ error: 'Minecraft server is not running.' });
     }
 }
 
